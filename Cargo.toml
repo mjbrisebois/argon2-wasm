@@ -15,8 +15,7 @@ wasm-bindgen-cli = "0.2.51"
 wee_alloc = "0.4.4"
 
 [dependencies.argon2min]
-git = "https://github.com/Holo-Host/argon2min"
-branch = "2019-10-13-holo-config"
+git = "https://github.com/FauxFaux/argon2min"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
