@@ -83,7 +83,6 @@ pub fn argon2_encoded(
 ) -> Fallible<Vec<u8>> {
     console_error_panic_hook::set_once();
 
-    // let config = Argon2::new(2, 4, 1 << 16, Argon2id).map_err(into_js_error)?;
     let config = config(passes, lanes, kib, version)?;
     let enc0 = Encoded::new(config, password, salt, pepper, ad);
 
@@ -91,8 +90,8 @@ pub fn argon2_encoded(
 }
 
 #[wasm_bindgen(js_name = verifyEncoded)]
-pub fn verify_encoded(hash: &[u8], password: &[u8]) -> Fallible<bool> {
-    let enc0 = Encoded::from_u8(&hash).map_err(into_js_error)?;
+pub fn verify_encoded(encoded: &[u8], password: &[u8]) -> Fallible<bool> {
+    let enc0 = Encoded::from_u8(&encoded).map_err(into_js_error)?;
 
     Ok(enc0.verify(password))
 }

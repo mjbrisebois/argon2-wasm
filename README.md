@@ -1,37 +1,89 @@
 
 # Argon2 Wasm
-
-## Release ![](https://img.shields.io/npm/v/@whi/argon2-wasm/latest?style=flat-square)
-Release source - https://github.com/mjbrisebois/argon2-wasm/
-
+![](https://img.shields.io/npm/v/@whi/argon2-wasm/latest?style=flat-square)
 
 ## Usage
 
+### Node examples
+
+#### Hash only
+
 ```js
-const { argon2,
-	verify } = require('@whi/argon2-wasm');
+const crypto = require('crypto');
+const { argon2, verify, Variant } = require('@whi/argon2-wasm');
 
 const password = Buffer.from("password");
 const salt = crypto.randomBytes( 64 );
 const pepper = crypto.randomBytes( 32 );
+const ad = new Uint8Array();
 
 const hash = Buffer.from( argon2(
     password,
     salt,
-    pepper
+    pepper,
+    ad,                 // additional data
+    2,                  // passes
+    4,                  // lanes
+    1 << 16,            // kib
+    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
 ));
+
+console.log( hash.toString('base64') );
+// nG5bVu8lDIwzi4pRJWYV9xglUiGH6rBESgbBP+Ol24aCZX81SmMJk2/gUl1OO8EGDjHeRPnqSYhunAlzekeTyQ==
+
+verify(
+    hash,
+    password,
+    salt,
+    pepper,
+    ad,                 // additional data
+    2,                  // passes
+    4,                  // lanes
+    1 << 16,            // kib
+    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
+));
+// returns true
 ```
 
-## How to bundle wasm for the web
+#### Config encoded in result
 
-### `bootstrap.js`
+```js
+const crypto = require('crypto');
+const { argon2Encoded, verifyEncoded, Variant } = require('@whi/argon2-wasm');
+
+const password = Buffer.from("password");
+const salt = crypto.randomBytes( 64 );
+const pepper = crypto.randomBytes( 32 );
+const ad = new Uint8Array();
+
+const encoded = Buffer.from( argon2Encoded(
+    password,
+    salt,
+    pepper,
+    ad,                 // additional data
+    2,                  // passes
+    4,                  // lanes
+    1 << 16,            // kib
+    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
+));
+
+console.log( hash.toString('base64') );
+// JGFyZ29uMmlkJHY9MTksbT02NTUzNix0PTIscD00LGtleWlkPUNrMGhBcXBYZDU1MFVLZExXbmdKRzU4am9PaFJTRXVoYll4MkhyN05vdWckenZsQkZWYSt0akN1Y1l2MTQ2eDREaDduZDN0dytsV0dPTzNodk1Pd2syaDZBT05CY1kxSEpqWUJma2g0VEs5cFRqZFdqWTJ5Z3kxSVNXM21Cd2JZc1EkZUxrS2had1M0dVhrYnA4K0JWdkxQVEZFR1Jyb0ZPOUdyekxtRXhUSEh3dw==
+
+verifyEncoded( hash, password );
+// returns true
+```
+
+### How to bundle wasm for the web
+
+#### `bootstrap.js`
 ```js
 import("./index.js")
     .then(m => Object.assign(window, m))
     .catch(e => console.error("Error importing `index.js`:", e));
 ```
 
-### `index.js`
+#### `index.js`
 ```js
 const { argon2,
 	verify } = require('@whi/argon2-wasm');
@@ -42,7 +94,7 @@ module.exports = {
 };
 ```
 
-### `webpack.config.js`
+#### `webpack.config.js`
 ```js
 module.exports = {
     target: "web",

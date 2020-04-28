@@ -10,7 +10,7 @@ dependencies = [
 
 [[package]]
 name = "argon2-wasm"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "argon2min 0.3.0 (git+https://github.com/FauxFaux/argon2min)",
  "console_error_panic_hook 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
