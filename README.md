@@ -10,22 +10,22 @@
 
 ```js
 const crypto = require('crypto');
-const { argon2, verify, Variant } = require('@whi/argon2-wasm');
+const { argon2, verify, HashType } = require('@whi/argon2-wasm');
 
 const password = Buffer.from("password");
 const salt = crypto.randomBytes( 64 );
 const pepper = crypto.randomBytes( 32 );
-const ad = new Uint8Array();
+const associated_data = new Uint8Array();
 
 const hash = Buffer.from( argon2(
     password,
     salt,
     pepper,
-    ad,                 // additional data
-    2,                  // passes
-    4,                  // lanes
-    1 << 16,            // kib
-    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
+    associated_data,
+    2,                  // iterations
+    4,                  // parallelism
+    1 << 16,            // memory_size
+    HashType.Argon2id   // hash type [ Argon2d, Argon2i, Argon2id ]
 ));
 
 console.log( hash.toString('base64') );
@@ -36,11 +36,11 @@ verify(
     password,
     salt,
     pepper,
-    ad,                 // additional data
-    2,                  // passes
-    4,                  // lanes
-    1 << 16,            // kib
-    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
+    associated_data,
+    2,                  // iterations
+    4,                  // parallelism
+    1 << 16,            // memory_size
+    HashType.Argon2id   // hash type [ Argon2d, Argon2i, Argon2id ]
 ));
 // returns true
 ```
@@ -49,22 +49,22 @@ verify(
 
 ```js
 const crypto = require('crypto');
-const { argon2Encoded, verifyEncoded, Variant } = require('@whi/argon2-wasm');
+const { argon2Encoded, verifyEncoded, HashType } = require('@whi/argon2-wasm');
 
 const password = Buffer.from("password");
 const salt = crypto.randomBytes( 64 );
 const pepper = crypto.randomBytes( 32 );
-const ad = new Uint8Array();
+const associated_data = new Uint8Array();
 
 const encoded = Buffer.from( argon2Encoded(
     password,
     salt,
     pepper,
-    ad,                 // additional data
-    2,                  // passes
-    4,                  // lanes
-    1 << 16,            // kib
-    Variant.Argon2id    // variant [ Argon2d, Argon2i, Argon2id ]
+    associated_data,
+    2,                  // iterations
+    4,                  // parallelism
+    1 << 16,            // memory_size
+    HashType.Argon2id   // hash type [ Argon2d, Argon2i, Argon2id ]
 ));
 
 console.log( hash.toString('base64') );
