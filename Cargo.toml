@@ -1,7 +1,7 @@
 [package]
 name = "argon2-wasm"
 description = "Argon2 wasm bindings with all inputs exposed"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["matthew@webheroes.ca"]
 edition = "2018"
 repository = "https://github.com/mjbrisebois/argon2-wasm"
