@@ -1,9 +1,8 @@
-# Build/test requirements (previously provided by nix-shell; nix is no longer needed):
-#   - rustup with the wasm32-unknown-unknown target installed
+# Build/test requirements:
+#   - rustup (rust-toolchain.toml pins the channel and the wasm32 target)
 #   - wasm-pack
 #   - node + npm
 #   - jq
-# The *.nix files are kept only for anyone who still wants a nix environment.
 
 pkg/package.json: Cargo.toml Cargo.lock $(wildcard src/*.rs) build.sh
 	bash build.sh
@@ -15,8 +14,12 @@ node_modules: package.json package-lock.json
 
 pkg: pkg/package.json
 
+# Explicit target so `make build` builds the package instead of falling through to
+# make's built-in `%: %.sh` rule, which would just copy build.sh to a file named `build`.
+build: pkg
 
-.PHONY: pkg preview-package publish-package test clean
+
+.PHONY: build pkg preview-package publish-package test clean
 
 
 preview-package: pkg
