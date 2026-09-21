@@ -1,10 +1,5 @@
 use argon2::{Algorithm, Argon2, AssociatedData, ParamsBuilder, Version};
-use core::convert::TryFrom;
 use wasm_bindgen::prelude::*;
-
-// wee_alloc shaves off ~4KB off WASM file size.
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 // Fixed output tag length and Argon2 version, matching the legacy argon2min build
 // these bindings replaced. Both must stay pinned: existing stored credentials were

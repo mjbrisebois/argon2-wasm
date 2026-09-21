@@ -3,14 +3,14 @@ name = "argon2-wasm"
 description = "Argon2 wasm bindings with all inputs exposed"
 version = "0.4.0"
 authors = ["matthew@webheroes.ca"]
-edition = "2018"
+edition = "2024"
+license = "ISC"
 repository = "https://github.com/mjbrisebois/argon2-wasm"
 
 [dependencies]
 console_error_panic_hook = "0.1.6"
 js-sys = "0.3.77"
 wasm-bindgen = "0.2.100"
-wee_alloc = "0.4.4"
 
 # RustCrypto Argon2, replacing the unmaintained argon2min fork. Byte-compatible
 # with argon2min on the raw-hash path (verified against tests/vectors). Default
