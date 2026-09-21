@@ -2,9 +2,8 @@
   "meta": {
     "generated": "2026-09-21",
     "generator": "tests/vectors/generate.cjs",
-    "source_impl": "argon2min (Rust) via @whi/argon2-wasm",
-    "argon2min_rev": "3694f89a",
-    "note": "Frozen known-answer corpus. Any Argon2 implementation replacing argon2min MUST reproduce every raw hash below byte-for-byte, or stored credentials break (verify() recomputes and compares). Regenerate ONLY from the implementation being replaced.",
+    "source_commit": "a88038a",
+    "note": "Frozen reference corpus: the exact Argon2 output bytes that stored credentials were created with (originally via argon2min; the package now uses RustCrypto argon2, which reproduces them). The package MUST reproduce every raw hash below byte-for-byte - verify() recomputes and compares, so changing any of these invalidates existing credentials. Do not regenerate except as a deliberate migration (see the generator header).",
     "fixed": {
       "version": "0x13 (v=19)",
       "output_bytes": 64

@@ -13,7 +13,7 @@ const path = require('path');
 
 const { argon2, verify } = require('../../pkg');
 const fixture = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../vectors/argon2min-vectors.json'), 'utf8')
+    fs.readFileSync(path.join(__dirname, '../vectors/reference-vectors.json'), 'utf8')
 );
 
 const b = (s) => Buffer.from(s, 'base64');
@@ -30,7 +30,7 @@ function verifyOf(v, hash) {
         v.iterations, v.parallelism, v.memory_size, v.hash_type);
 }
 
-describe(`Known-answer vectors (frozen from argon2min rev ${fixture.meta.argon2min_rev})`, () => {
+describe('Known-answer vectors (frozen reference — tests/vectors/reference-vectors.json)', () => {
     it('the corpus is present and non-trivial', () => {
         expect(fixture.raw.length).to.equal(fixture.meta.count);
         expect(fixture.raw.length).to.be.greaterThan(20);
