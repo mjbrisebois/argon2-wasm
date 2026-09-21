@@ -1,7 +1,6 @@
 use argon2min::verifier::Encoded;
 use argon2min::Argon2;
 use argon2min::Variant::{Argon2d, Argon2i, Argon2id};
-use failure::*;
 use wasm_bindgen::prelude::*;
 
 // wee_alloc shaves off ~4KB off WASM file size.
@@ -10,7 +9,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 pub type Fallible<T> = Result<T, JsValue>;
 
-pub fn into_js_error(err: impl Fail) -> JsValue {
+pub fn into_js_error(err: impl std::fmt::Display) -> JsValue {
     js_sys::Error::new(&err.to_string()).into()
 }
 

@@ -8,14 +8,13 @@ repository = "https://github.com/mjbrisebois/argon2-wasm"
 
 [dependencies]
 console_error_panic_hook = "0.1.6"
-failure = "0.1.6"
-js-sys = "0.3.30"
-wasm-bindgen = "0.2.51"
-wasm-bindgen-cli = "0.2.51"
+js-sys = "0.3.77"
+wasm-bindgen = "0.2.100"
 wee_alloc = "0.4.4"
 
 [dependencies.argon2min]
 git = "https://github.com/FauxFaux/argon2min"
+rev = "3694f89a"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

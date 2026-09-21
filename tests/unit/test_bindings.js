@@ -1,3 +1,8 @@
+// Self-consistency tests: hash then verify with random inputs, plus the PHC-encoded
+// (argon2Encoded/verifyEncoded) round-trip. These prove the build agrees with itself.
+// They do NOT guard byte-compatibility across implementations — that is the job of
+// test_vectors.js, which asserts hashes frozen from argon2min. Keep both.
+
 const expect				= require('chai').expect;
 const crypto				= require('crypto');
 
