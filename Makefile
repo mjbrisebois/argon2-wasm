@@ -8,19 +8,15 @@
 pkg/package.json: Cargo.toml Cargo.lock $(wildcard src/*.rs) build.sh
 	bash build.sh
 
-docs/index.html: .jsdoc.json pkg/package.json
-	npx jsdoc pkg/wasm_key_manager.js --configure .jsdoc.json --destination docs --verbose
-
 node_modules: package.json package-lock.json
 	npm install
 	@touch node_modules
 
 
 pkg: pkg/package.json
-docs: docs/index.html
 
 
-.PHONY: pkg docs preview-package publish-docs publish-package test clean
+.PHONY: pkg preview-package publish-package test clean
 
 
 preview-package: pkg
@@ -28,14 +24,6 @@ preview-package: pkg
 
 publish-package: pkg
 	npm publish --access public ./pkg
-
-publish-docs: pkg
-	@echo "\nBuilding docs"
-	make docs
-	ln -s docs v$$( cat ./pkg/package.json | jq -r .version )
-	@echo "\nAdding docs..."
-	git add -f docs
-	git add v$$( cat ./pkg/package.json | jq -r .version )
 
 test: node_modules pkg
 	npm test
