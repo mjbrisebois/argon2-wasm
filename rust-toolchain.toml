@@ -1,0 +1,6 @@
+# Pins the toolchain rustup uses for this crate. "stable" is always >= 1.85, which
+# the 2024 edition requires, and rustup auto-installs the listed target so a fresh
+# clone builds without a manual `rustup target add`.
+[toolchain]
+channel = "stable"
+targets = ["wasm32-unknown-unknown"]
