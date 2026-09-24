@@ -1,0 +1,66 @@
+name: Publish
+
+# Runs when a release lands on master. Uses npm trusted publishing (OIDC, no stored
+# token; provenance is automatic) to STAGE the release — it does not go live. A
+# maintainer then promotes it with 2FA (`npm stage approve`, or on npmjs.com), which
+# is the human gate. Auto-triggers on merge; no GitHub approval step.
+#
+# Idempotent via the git tag: staged versions are not visible to `npm view`, so the
+# tag (created at stage time) is what marks "this version has been cut", making
+# ordinary pushes to master safe.
+on:
+  push:
+    branches: [master]
+
+permissions:
+  id-token: write        # OIDC — npm authenticates with no stored token
+  contents: write        # push the release tag
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production   # required by the npm trusted-publisher config (OIDC claim); no reviewer
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Update npm (trusted publishing / staging needs >= 11.5.1)
+        run: npm install -g npm@latest
+
+      - name: Determine version and whether it is already cut
+        id: check
+        run: |
+          VER="$(grep '^version' Cargo.toml | head -1 | cut -d'"' -f2)"
+          TAG="v$VER"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already exists; nothing to stage."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and test
+        if: steps.check.outputs.skip != 'true'
+        run: make test
+
+      - name: Stage the release (promote later with `npm stage approve`)
+        if: steps.check.outputs.skip != 'true'
+        run: npm stage publish ./pkg
+
+      - name: Tag the release
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          git tag "${{ steps.check.outputs.tag }}"
+          git push origin "${{ steps.check.outputs.tag }}"
