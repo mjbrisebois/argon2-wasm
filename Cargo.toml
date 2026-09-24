@@ -1,21 +1,25 @@
 [package]
 name = "argon2-wasm"
 description = "Argon2 wasm bindings with all inputs exposed"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["matthew@webheroes.ca"]
-edition = "2018"
+edition = "2024"
+license = "ISC"
 repository = "https://github.com/mjbrisebois/argon2-wasm"
 
 [dependencies]
 console_error_panic_hook = "0.1.6"
-failure = "0.1.6"
-js-sys = "0.3.30"
-wasm-bindgen = "0.2.51"
-wasm-bindgen-cli = "0.2.51"
-wee_alloc = "0.4.4"
+js-sys = "0.3.77"
+wasm-bindgen = "0.2.100"
 
-[dependencies.argon2min]
-git = "https://github.com/FauxFaux/argon2min"
+# RustCrypto Argon2, replacing the unmaintained argon2min fork. Byte-compatible
+# with argon2min on the raw-hash path (verified against tests/vectors). Default
+# features are disabled to drop the password-hash/getrandom pull, which we do not
+# use and which complicates the wasm32 target.
+[dependencies.argon2]
+version = "0.5"
+default-features = false
+features = ["alloc"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
