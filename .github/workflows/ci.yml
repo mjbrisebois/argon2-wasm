@@ -7,24 +7,53 @@ on:
     branches: [develop, master]
 
 jobs:
-  test:
+  fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Format check
+        run: cargo fmt --check
 
-      - name: Install Rust (stable) with the wasm target
-        uses: dtolnay/rust-toolchain@stable
+  # Only meaningful for a release (develop -> master), where a forgotten version
+  # bump must fail before merge. Skipped on develop pushes/PRs, where there is
+  # nothing to release and no bump is expected.
+  version-check:
+    runs-on: ubuntu-latest
+    if: github.base_ref == 'master'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # need tags to check whether this version is already released
+      - name: Assert version is unreleased
+        run: |
+          VER="$(grep '^version' Cargo.toml | head -1 | cut -d'"' -f2)"
+          TAG="v$VER"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "::error::$TAG already exists. Bump 'version' in Cargo.toml before merging to master."
+            exit 1
+          fi
+          echo "OK: $TAG is new and will be published on merge."
+
+  test:
+    runs-on: ubuntu-latest
+    # Run only once the quick checks pass, so a format or (on master PRs)
+    # version-check failure fails the PR without waiting on the slower build+test.
+    # The `if` lets tests still run when version-check is skipped (develop) rather
+    # than being skipped too.
+    needs: [fmt, version-check]
+    if: ${{ !failure() && !cancelled() }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Install Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      # jq is preinstalled on ubuntu-latest runners.
       - name: Build and test
         run: make test
