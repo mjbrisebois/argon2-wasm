@@ -44,9 +44,10 @@ describe('Cloudflare Workers (packed tarball, bundled by Wrangler, run in worker
         fs.cpSync(FIXTURE_DIR, tmp, { recursive: true });
         fs.copyFileSync(VECTORS, path.join(tmp, 'src/reference-vectors.json'));
 
-        const [{ filename }] = JSON.parse(
-            run('npm', ['pack', path.join(ROOT, 'pkg'), '--pack-destination', tmp, '--json'], tmp)
-        );
+        // Find the tarball on disk rather than parsing `npm pack --json`, whose output
+        // shape changed in npm 12 (array -> object keyed by package name).
+        run('npm', ['pack', path.join(ROOT, 'pkg'), '--pack-destination', tmp], tmp);
+        const filename = fs.readdirSync(tmp).find((f) => f.endsWith('.tgz'));
         fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ private: true }));
         run('npm', ['install', '--no-audit', '--no-fund', '--no-package-lock', `./${filename}`], tmp);
 
