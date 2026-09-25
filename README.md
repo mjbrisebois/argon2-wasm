@@ -51,16 +51,27 @@ verify(
 // returns true
 ```
 
-### Bundlers and Cloudflare Workers (ESM)
+### Cloudflare Workers
 
 ```js
 import { argon2, verify, HashType } from '@whi/argon2-wasm';
 ```
 
-The package ships both a CommonJS and an ESM build and its `exports` map selects
-the right one automatically: `require` resolves to the CommonJS build for Node,
-`import` resolves to the ESM build, which imports the wasm as a module (what
-bundlers and Cloudflare Workers need).
+Works as-is in a Worker bundled by Wrangler: the package's `exports` map has a
+`workerd` condition pointing at a Workers-specific entry, so no manual wasm
+instantiation is needed. This is tested on every build (`tests/e2e`) by installing
+the packed package into a fixture Worker, bundling it with Wrangler, and running it
+in workerd.
+
+### Bundlers and Node (ESM)
+
+```js
+import { argon2, verify, HashType } from '@whi/argon2-wasm';
+```
+
+Outside Workers, `import` resolves to wasm-pack's bundler build, which imports the
+wasm as an ES module. In Node that relies on Node's experimental wasm-module
+support (Node prints an `ExperimentalWarning`); use `require` to avoid it.
 
 ## API
 
@@ -85,6 +96,14 @@ Requirements: `rustup` (the channel and wasm32 target are pinned in
 ```
 make test     # build the package and run the test suite
 make pkg      # build the publishable package into ./pkg
+```
+
+`make test` runs two layers, which can also be run on their own against an
+existing build:
+
+```
+npm run test:integration  # the built ./pkg in Node, incl. the reference vectors
+npm run test:e2e          # the packed tarball in a Wrangler-bundled Worker (workerd)
 ```
 
 ### Crypto invariant — read before changing the hashing dependency or parameters

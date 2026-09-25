@@ -1,10 +1,14 @@
 {
   "scripts": {
-    "test": "mocha --recursive ./tests/unit",
+    "test": "npm run test:integration && npm run test:e2e",
+    "test:integration": "mocha --recursive ./tests/integration",
+    "test:e2e": "mocha ./tests/e2e/test_*.js",
     "gen-vectors": "node tests/vectors/generate.cjs"
   },
   "devDependencies": {
     "chai": "^4.5.0",
-    "mocha": "^12.0.2"
+    "miniflare": "^5.20260923.0-alpha",
+    "mocha": "^12.0.2",
+    "wrangler": "^4.140.0"
   }
 }

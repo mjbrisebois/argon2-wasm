@@ -1,0 +1,8 @@
+# Fixture Worker for tests/e2e/test_workerd.js. The test copies this directory into
+# a temp dir, installs the packed @whi/argon2-wasm tarball next to it, and copies
+# the reference vectors into src/ before bundling.
+name = "argon2-wasm-e2e"
+main = "src/index.js"
+# Also used by the test to run the bundle; must not be newer than the workerd
+# version that the miniflare devDependency ships.
+compatibility_date = "2026-09-01"
