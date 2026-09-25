@@ -55,5 +55,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      # Match publish.yml, which needs npm@latest for staged publishing, so an npm
+      # release that breaks the build fails here on develop rather than mid-release.
+      - name: Update npm (same as publish.yml)
+        run: npm install -g npm@latest
       - name: Build and test
         run: make test
