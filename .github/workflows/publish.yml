@@ -8,9 +8,14 @@ name: Publish
 # Idempotent via the git tag: staged versions are not visible to `npm view`, so the
 # tag (created at stage time) is what marks "this version has been cut", making
 # ordinary pushes to master safe.
+#
+# workflow_dispatch is for re-running the publish by hand (Actions tab, "Run
+# workflow") when the push trigger never fired, e.g. GitHub dropped the event
+# during an outage. The tag check makes a manual run safe at any time.
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 permissions:
   id-token: write        # OIDC — npm authenticates with no stored token
@@ -18,6 +23,8 @@ permissions:
 
 jobs:
   publish:
+    # A manual run can be started from any branch; only master is a release.
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     environment: production   # required by the npm trusted-publisher config (OIDC claim); no reviewer
     steps:
