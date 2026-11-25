@@ -1,7 +1,7 @@
 [package]
 name = "argon2-wasm"
 description = "Argon2 wasm bindings with all inputs exposed"
-version = "0.5.2"
+version = "0.5.3"
 authors = ["matthew@webheroes.ca"]
 edition = "2024"
 license = "ISC"
@@ -17,7 +17,7 @@ wasm-bindgen = "0.2.100"
 # features are disabled to drop the password-hash/getrandom pull, which we do not
 # use and which complicates the wasm32 target.
 [dependencies.argon2]
-version = "0.5"
+version = "0.6"
 default-features = false
 features = ["alloc"]
 
