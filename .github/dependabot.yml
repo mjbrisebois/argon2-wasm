@@ -1,0 +1,59 @@
+version: 2
+
+# Weekly updates for npm packages, Rust crates and the GitHub Actions the
+# workflows use, opened against develop so they ship with the next normal
+# release. Minor and patch bumps arrive as one grouped PR per ecosystem;
+# each major bump gets its own PR so a breaking upgrade doesn't block the
+# rest. Major action releases are how actions move to a newer Node runtime,
+# so leaving them unmerged brings back GitHub's deprecation warnings.
+#
+# Urgent security fixes are not configured here: a Dependabot rule in the
+# repo settings opens PRs only for critical alerts in runtime dependencies
+# (the Rust crates compiled into the wasm; the npm dependencies are all test
+# tooling). Those go to master, where they fail version-check until a
+# release is cut, which is intended: a fix only reaches users through a new
+# version.
+#
+# Dependabot reads this file from the default branch (master), so changes
+# take effect after the next release.
+updates:
+    - package-ecosystem: npm
+      directory: /
+      target-branch: develop
+      schedule:
+          interval: weekly
+      groups:
+          # The workerd e2e test bundles with wrangler and runs the bundle
+          # with miniflare, so the two move together, majors included, to
+          # keep the test on the same workerd wrangler deploys with. Listed
+          # first because an update joins the first group it matches.
+          cloudflare:
+              patterns: ['wrangler', 'miniflare']
+          minor-and-patch:
+              update-types: [minor, patch]
+
+    - package-ecosystem: cargo
+      directory: /
+      target-branch: develop
+      schedule:
+          interval: weekly
+      groups:
+          # argon2 gets a PR of its own: a bump that changes hash output
+          # fails the reference-vector tests, and on its own PR that failure
+          # points straight at it.
+          argon2:
+              patterns: ['argon2']
+          # wasm-bindgen and js-sys are released in lockstep and must match.
+          wasm-bindgen:
+              patterns: ['wasm-bindgen', 'js-sys']
+          minor-and-patch:
+              update-types: [minor, patch]
+
+    - package-ecosystem: github-actions
+      directory: /
+      target-branch: develop
+      schedule:
+          interval: weekly
+      groups:
+          minor-and-patch:
+              update-types: [minor, patch]
